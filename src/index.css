@@ -1,0 +1,11 @@
+.card-bg-img{
+    background-image: url('./assets/Submit-bg.jpg');
+    background-position: right;
+    background-size: cover;
+    width: 100%;
+}
+.dash-bg-img{
+    background-image: url('./assets/dashboard-bg.jpg');
+    background-position: right;
+    width: 100%;
+}
