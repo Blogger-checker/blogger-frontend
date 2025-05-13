@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSort, faTh, faThList } from '@fortawesome/free-solid-svg-icons';
 import { faClock, faEnvelope, faEye, faIdCard, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
-import banner from '../src/assets/blog-list-hero-img.jpg';
+import banner from '../assets/blog-list-hero-img.jpg';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
