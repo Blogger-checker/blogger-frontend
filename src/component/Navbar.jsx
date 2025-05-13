@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 export default function Navbar() {
   return (
@@ -17,8 +17,15 @@ export default function Navbar() {
         </div>
 
         <div>
-            <Link to="/" className="btn btn-primary me-2">Submit Blog</Link>
-            <Link to="/dashboard" className="btn btn-outline-secondary">My Dashboard</Link>
+            <NavLink  to="/"  className={({ isActive }) =>  isActive ? "btn btn-primary me-2" : "btn btn-outline-primary me-2"}>
+              Submit Blog
+            </NavLink>
+            <NavLink  to="/blog-list"  className={({ isActive }) =>  isActive ? "btn btn-primary me-2" : "btn btn-outline-primary me-2"}>
+              Blog list
+            </NavLink>
+            <NavLink to="/dashboard" className={({ isActive }) => isActive ? "btn btn-primary" : "btn btn-outline-secondary"}>
+              My Dashboard
+            </NavLink>
         </div>
       </nav>
     </>
