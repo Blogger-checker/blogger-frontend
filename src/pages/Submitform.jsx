@@ -6,6 +6,8 @@ import ReviewStep from './ReviewStep';
 import PublishStep from './PublishStep';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Submitform() {
     const [isGuidelinesOpen, setIsGuidelinesOpen] = useState(true);
     const [currentStep, setCurrentStep] = useState('submit');
@@ -56,7 +58,7 @@ export default function Submitform() {
                 });
 
                 // Send file to backend for processing
-                const response = await axios.post('http://localhost:5000/api/blogs/submit', formDataToSend, {
+                const response = await axios.post(`${API_URL}/submit`, formDataToSend, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -170,7 +172,7 @@ export default function Submitform() {
             }
 
             // Call API to publish the blog
-            const response = await axios.post(`http://localhost:5000/api/blogs/${formData.blogId}/publish`);
+            const response = await axios.post(`${API_URL}/${formData.blogId}/publish`);
             setReviewResult({
                 ...result,
                 publishedUrl: response.data.publishedUrl

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSort, faTh, faThList } from '@fortawesome/free-solid-svg-icons';
 import { faClock, faEnvelope, faEye, faIdCard, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
-import banner from '../../../frontend-bloggers/src/assets/blog-list-hero-img.jpg';
+import banner from '../src/assets/blog-list-hero-img.jpg';
 import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Blogslist() {
   const [blogs, setBlogs] = useState([]);
@@ -21,7 +23,7 @@ export default function Blogslist() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/blogs/published');
+      const response = await axios.get(`${API_URL}/published`);
       console.log(response.data)
       setBlogs(response.data);
       setError(null);
