@@ -21,19 +21,6 @@ export default function PublishStep({ reviewResult }) {
                             <p className="text-muted mb-4">
                                 Your blog has been successfully published and is now available for readers.
                             </p>
-                            {blogLink && (
-                                <div className="d-flex align-items-center justify-content-center mb-4">
-                                    <FontAwesomeIcon icon={faLink} className="text-primary me-2" />
-                                    <a 
-                                        href={blogLink} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-primary"
-                                    >
-                                        View your published blog
-                                    </a>
-                                </div>
-                            )}
                         </>
                     ) : (
                         <>

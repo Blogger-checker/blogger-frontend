@@ -1,9 +1,146 @@
 import { faCheckCircle, faClock, faFileAlt, faTimesCircle } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Dashboard() {
-    
+    const [stats, setStats] = useState({
+        total: 0,
+        published: 0,
+        pending: 0,
+        rejected: 0
+    });
+    const [submissions, setSubmissions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                
+                // Add timeout to prevent infinite loading
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // Increased timeout
+                
+                // Log the API URL being called
+                console.log('Fetching from:', `${API_URL}/all`);
+                
+                // Fetch all blogs with error details
+                const response = await axios.get(`${API_URL}/all`, {
+                    signal: controller.signal,
+                    validateStatus: null, // Allow all status codes
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                clearTimeout(timeoutId);
+
+                // Log the full response for debugging
+                console.log('Server response:', response);
+
+                // Check response status
+                if (response.status !== 200) {
+                    throw new Error(`Server responded with status ${response.status}: ${
+                        response.data?.message || 
+                        response.data?.error || 
+                        response.statusText || 
+                        'Unknown error'
+                    }`);
+                }
+
+                const blogs = response.data;
+                
+                // Validate response data
+                if (!blogs || !Array.isArray(blogs)) {
+                    console.error('Invalid response format:', blogs);
+                    throw new Error('Invalid data format received from server');
+                }
+                
+                // Calculate statistics
+                const total = blogs.length;
+                const published = blogs.filter(blog => blog.status === 'published').length;
+                const pending = blogs.filter(blog => blog.status === 'pending').length;
+                const rejected = blogs.filter(blog => blog.status === 'rejected').length;
+                
+                setStats({ total, published, pending, rejected });
+                setSubmissions(blogs);
+            } catch (err) {
+                console.error('Detailed error:', err);
+                console.error('Error response:', err.response?.data);
+                
+                let errorMessage = 'Failed to load dashboard data. ';
+                
+                if (err.code === 'ECONNREFUSED') {
+                    errorMessage += 'Cannot connect to server. Please check if the server is running.';
+                } else if (err.name === 'AbortError') {
+                    errorMessage += 'Request timed out. Please check your connection.';
+                } else if (err.response?.status === 500) {
+                    errorMessage += `Server error: ${err.response.data?.message || 'Internal server error'}`;
+                } else {
+                    errorMessage += err.message || 'Please try again later.';
+                }
+                
+                setError(errorMessage);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
+
+    const getStatusIcon = (status) => {
+        switch (status) {
+            case 'published':
+                return <FontAwesomeIcon icon={faCheckCircle} className="text-success" />;
+            case 'pending':
+                return <FontAwesomeIcon icon={faClock} className="text-warning" />;
+            case 'rejected':
+                return <FontAwesomeIcon icon={faTimesCircle} className="text-danger" />;
+            default:
+                return null;
+        }
+    };
+
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'published':
+                return <span className="badge bg-success me-2">Published</span>;
+            case 'pending':
+                return <span className="badge bg-warning text-dark me-2">Under Review</span>;
+            case 'rejected':
+                return <span className="badge bg-danger me-2">Rejected</span>;
+            default:
+                return null;
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="bg-light min-vh-100 d-flex justify-content-center align-items-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-light min-vh-100 d-flex justify-content-center align-items-center">
+                <div className="alert alert-danger" role="alert">
+                    {error}
+                </div>
+            </div>
+        );
+    }
+
   return (
     <div className="bg-light min-vh-100">
       {/* Main Content */}
@@ -26,7 +163,7 @@ export default function Dashboard() {
             <div className="card h-100 border-0 bg-light">
               <div className="card-body">
                 <h6 className="text-primary">Total Submissions</h6>
-                <h1 className="display-4 fw-bold">3</h1>
+                <h1 className="display-4 fw-bold">{stats.total}</h1>
               </div>
               <div className="card-footer bg-light border-0 text-end">
                 <FontAwesomeIcon icon={faFileAlt} className="text-primary opacity-50" size="lg" />
@@ -37,7 +174,7 @@ export default function Dashboard() {
             <div className="card h-100 border-0 bg-light">
               <div className="card-body">
                 <h6 className="text-success">Published Blogs</h6>
-                <h1 className="display-4 fw-bold">1</h1>
+                <h1 className="display-4 fw-bold">{stats.published}</h1>
               </div>
               <div className="card-footer bg-light border-0 text-end">
                 <FontAwesomeIcon icon={faCheckCircle} className="text-success opacity-50" size="lg" />
@@ -48,7 +185,7 @@ export default function Dashboard() {
             <div className="card h-100 border-0 bg-light">
               <div className="card-body">
                 <h6 className="text-warning">Pending Review</h6>
-                <h1 className="display-4 fw-bold">1</h1>
+                <h1 className="display-4 fw-bold">{stats.pending}</h1>
               </div>
               <div className="card-footer bg-light border-0 text-end">
                 <FontAwesomeIcon icon={faClock} className="text-warning opacity-50" size="lg" />
@@ -62,72 +199,38 @@ export default function Dashboard() {
           <div className="col-lg-7 mb-4">
             <h5 className="fw-bold mb-3">Recent Submissions</h5>
             
-            {/* Submission 1 */}
-            <div className="card mb-3 border-0 shadow-sm">
-              <div className="card-body position-relative">
-                <div className="position-absolute end-0 top-0 mt-3 me-3">
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
-                </div>
-                <h5 className="mb-1">The Future of AI in Healthcare</h5>
-                <p className="text-muted small mb-3">Category: Technology • Submitted: 2025-05-08</p>
-                
-                <div className="alert alert-success bg-success bg-opacity-10 border-success border-opacity-25">
-                  <div className="d-flex align-items-center mb-2">
-                    <span className="badge bg-success me-2">Published</span>
-                    <span>Your blog has been approved and published! We've sent you an email with the link.</span>
-                    <div className="ms-auto">
-                      <a href="#" className="text-decoration-none">View Details</a>
+            {submissions.map((submission) => (
+                <div key={submission._id} className="card mb-3 border-0 shadow-sm">
+                    <div className="card-body position-relative">
+                        <div className="position-absolute end-0 top-0 mt-3 me-3">
+                            {getStatusIcon(submission.status)}
+                        </div>
+                        <h5 className="mb-1">{submission.title}</h5>
+                        <p className="text-muted small mb-3">
+                            Category: {submission.category} • Submitted: {submission.createdAt ? new Date(submission.createdAt).toLocaleDateString() : 'N/A'}
+                        </p>
+                        
+                        <div className={`alert alert-${submission.status === 'published' ? 'success' : submission.status === 'pending' ? 'warning' : 'danger'} bg-${submission.status === 'published' ? 'success' : submission.status === 'pending' ? 'warning' : 'danger'} bg-opacity-10 border-${submission.status === 'published' ? 'success' : submission.status === 'pending' ? 'warning' : 'danger'} border-opacity-25`}>
+                            <div className="d-flex align-items-center mb-2">
+                                {getStatusBadge(submission.status)}
+                                <span>
+                                    {submission.status === 'published' 
+                                        ? 'Your blog has been approved and published! We\'ve sent you an email with the link.'
+                                        : submission.status === 'pending'
+                                            ? 'Your blog is currently being reviewed for word count and originality.'
+                                            : 'Your blog was rejected. Please check the details for more information.'}
+                                </span>
+                            </div>
+                            {submission.status === 'published' && (
+                                <div className="d-flex align-items-center">
+                                    <FontAwesomeIcon icon={faCheckCircle} className="text-success me-2" />
+                                    <span>Your blog is live! View it at <a href={submission.publicUrl} className="text-decoration-none">{submission.publicUrl}</a></span>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <FontAwesomeIcon icon={faCheckCircle} className="text-success me-2" />
-                    <span>Your blog is live! View it at <a href="blogcheck.com/p/1" className="text-decoration-none">blogcheck.com/p/1</a></span>
-                  </div>
                 </div>
-              </div>
-            </div>
-            
-            {/* Submission 2 */}
-            <div className="card mb-3 border-0 shadow-sm">
-              <div className="card-body position-relative">
-                <div className="position-absolute end-0 top-0 mt-3 me-3">
-                  <FontAwesomeIcon icon={faClock} className="text-warning" />
-                </div>
-                <h5 className="mb-1">Sustainable Living in Urban Areas</h5>
-                <p className="text-muted small mb-3">Category: Environment • Submitted: 2025-05-05</p>
-                
-                <div className="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25">
-                  <div className="d-flex align-items-center">
-                    <span className="badge bg-warning text-dark me-2">Under Review</span>
-                    <span>Your blog is currently being reviewed for word count and originality.</span>
-                    <div className="ms-auto">
-                      <a href="#" className="text-decoration-none">View Details</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Submission 3 */}
-            <div className="card mb-3 border-0 shadow-sm">
-              <div className="card-body position-relative">
-                <div className="position-absolute end-0 top-0 mt-3 me-3">
-                  <FontAwesomeIcon icon={faTimesCircle} className="text-danger" />
-                </div>
-                <h5 className="mb-1">Financial Planning for Millennials</h5>
-                <p className="text-muted small mb-3">Category: Finance • Submitted: 2025-05-01</p>
-                
-                <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25">
-                  <div className="d-flex align-items-center">
-                    <span className="badge bg-danger me-2">Rejected</span>
-                    <span>Your blog was rejected because it has fewer than 800 words. Please revise and resubmit.</span>
-                    <div className="ms-auto">
-                      <a href="#" className="text-decoration-none">View Details</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
           
           {/* Stats & Tips */}
@@ -136,11 +239,10 @@ export default function Dashboard() {
             <div className="card mb-4 border-0 shadow-sm">
               <div className="card-body d-flex justify-content-center">
                 <div style={{ width: '200px', height: '200px' }}>
-                  {/* This would be a donut chart in a real implementation */}
                   <svg viewBox="0 0 100 100" className="w-100 h-100">
-                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#ffc107" strokeWidth="20" strokeDasharray="73 110"></circle>
-                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#dc3545" strokeWidth="20" strokeDasharray="73 110" strokeDashoffset="-73"></circle>
-                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#28a745" strokeWidth="20" strokeDasharray="73 110" strokeDashoffset="-146"></circle>
+                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#ffc107" strokeWidth="20" strokeDasharray={`${(stats.pending / stats.total) * 220 || 0} 220`}></circle>
+                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#dc3545" strokeWidth="20" strokeDasharray={`${(stats.rejected / stats.total) * 220 || 0} 220`} strokeDashoffset={`-${(stats.pending / stats.total) * 220 || 0}`}></circle>
+                    <circle cx="50" cy="50" r="35" fill="transparent" stroke="#28a745" strokeWidth="20" strokeDasharray={`${(stats.published / stats.total) * 220 || 0} 220`} strokeDashoffset={`-${((stats.pending + stats.rejected) / stats.total) * 220 || 0}`}></circle>
                     <circle cx="50" cy="50" r="25" fill="white"></circle>
                   </svg>
                 </div>

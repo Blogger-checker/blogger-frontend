@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faClock, faEnvelope, faFileWord, faUser, faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 import { faAlignLeft, faChevronDown, faInfoCircle, faUpload } from '@fortawesome/free-solid-svg-icons';
 import ReviewStep from './ReviewStep';
-import PublishStep from './PublishStep';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -341,13 +340,6 @@ export default function Submitform() {
                         <h3 className="mb-3">Blog Published Successfully!</h3>
                         <p className="text-muted mb-4">
                             Your blog has been published and is now available to readers.
-                            {reviewResult?.publishedUrl && (
-                                <div className="mt-3">
-                                    <a href={reviewResult.publishedUrl} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                                        View Published Blog
-                                    </a>
-                                </div>
-                            )}
                         </p>
                         <p className="text-muted">
                             You will be redirected to the submit page in 10 seconds...
@@ -391,7 +383,7 @@ export default function Submitform() {
                                 </div>
                             </div>
 
-                            <div className="d-flex flex-column align-items-center">
+                            {/* <div className="d-flex flex-column align-items-center">
                                 <div className={`rounded-circle ${currentStep === 'review' ? 'bg-primary' : 'bg-light'} ${currentStep === 'review' ? 'text-white' : 'text-dark'}  border border-1  d-flex align-items-center justify-content-center mb-2`} 
                                     style={{ width: '32px', height: '32px', fontSize: '0.875rem' }}>
                                     2
@@ -400,12 +392,12 @@ export default function Submitform() {
                                     <span className="fw-bold" style={{ fontSize: '0.9rem' }}>Review</span>
                                     <span className="text-muted" style={{ fontSize: '0.8rem' }}>We check content</span>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="d-flex flex-column align-items-center">
                                 <div className={`rounded-circle ${currentStep === 'publish' ? 'bg-primary' : 'bg-light'} ${currentStep === 'publish' ? 'text-white' : 'text-dark'} border border-1 d-flex align-items-center justify-content-center mb-2`} 
                                     style={{ width: '32px', height: '32px', fontSize: '0.875rem' }}>
-                                    3
+                                    2
                                 </div>
                                 <div className="d-flex flex-column align-items-center">
                                     <span className="fw-bold" style={{ fontSize: '0.9rem' }}>Publish</span>

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSort, faTh, faThList } from '@fortawesome/free-solid-svg-icons';
 import { faClock, faEnvelope, faEye, faIdCard, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
+import { useNavigate } from 'react-router-dom';
 import banner from '../assets/blog-list-hero-img.jpg';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Blogslist() {
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,13 +25,19 @@ export default function Blogslist() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
+      console.log('Fetching blogs from:', `${API_URL}/published`);
       const response = await axios.get(`${API_URL}/published`);
-      console.log(response.data)
+      console.log('API Response:', response);
       setBlogs(response.data);
       setError(null);
     } catch (err) {
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        config: err.config
+      });
       setError('Failed to fetch blogs. Please try again later.');
-      console.error('Error fetching blogs:', err);
     } finally {
       setLoading(false);
     }
@@ -198,7 +206,12 @@ export default function Blogslist() {
                         <div className="d-flex align-items-center mb-3">
                           <span className="fw-medium">{blog.authorName}</span>
                         </div>
-                        <a href={blog.publicUrl} className="btn btn-primary btn-sm">Read More</a>
+                        <button 
+                          onClick={() => navigate(`/blogs/${blog._id}`)}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Read More
+                        </button>
                       </div>
                       <div className="card-footer bg-white border-0 py-3">
                         <div className="d-flex align-items-center text-secondary small">
@@ -242,25 +255,6 @@ export default function Blogslist() {
                         );
                       })}
                     </ul>
-                  </div>
-                </div>
-
-                {/* Newsletter Subscription */}
-                <div className="card bg-primary text-white border-0">
-                  <div className="card-body p-4">
-                    <h5 className="card-title mb-3 d-flex align-items-center">
-                      <span className="badge bg-white text-primary me-2">
-                        <FontAwesomeIcon icon={faEnvelope} />
-                      </span>
-                      Subscribe to Newsletter
-                    </h5>
-                    <p className="mb-3">Get the latest blogs delivered directly to your inbox.</p>
-                    <form>
-                      <div className="mb-3">
-                        <input type="email" className="form-control" placeholder="Your email address" />
-                      </div>
-                      <button type="submit" className="btn btn-light w-100">Subscribe Now</button>
-                    </form>
                   </div>
                 </div>
               </div>
