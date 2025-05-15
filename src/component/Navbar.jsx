@@ -41,17 +41,17 @@ export default function Navbar() {
             <div className="nav-links d-flex align-items-center">
               
                 <FontAwesomeIcon icon={faEdit} className="me-1" />
-                <NavLink  to="/"  className={({ isActive }) =>  isActive ? "text-primary me-2" : "text-secondary"}>
+                <NavLink  to="/"  className={({ isActive }) =>  isActive ? "text-primary me-3" : "text-secondary me-3"}>
                   Submit Blog
                 </NavLink>
               
                 <FontAwesomeIcon icon={faTachometerAlt} className="me-1" />
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-primary" : "text-secondary"}>
+                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-primary me-3" : "text-secondary me-3"}>
                           My Dashboard
                 </NavLink>
               
                 <FontAwesomeIcon icon={faBook} className="me-1" />
-                <NavLink  to="/blog-list"  className={({ isActive }) =>  isActive ? "text-primary" : "text-secondary"}>
+                <NavLink  to="/blog-list"  className={({ isActive }) =>  isActive ? "text-primary me-3" : "text-secondary me-3"}>
                         Browse Blogs
                 </NavLink>
               
