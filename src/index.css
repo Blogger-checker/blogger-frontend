@@ -1,3 +1,6 @@
+a{
+    text-decoration: none;
+}
 .card-bg-img{
     background-image: url('./assets/Submit-bg.jpg');
     background-position: right;

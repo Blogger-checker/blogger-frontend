@@ -1,3 +1,6 @@
 .main{
     background-color: #edebebcc;
 }
+a{
+    text-decoration: none !important;
+}

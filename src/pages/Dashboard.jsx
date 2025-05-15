@@ -2,6 +2,7 @@ import { faCheckCircle, faClock, faFileAlt, faTimesCircle } from '@fortawesome/f
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { faBan } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -184,11 +185,11 @@ export default function Dashboard() {
           <div className="col-md-4">
             <div className="card h-100 border-0 bg-light">
               <div className="card-body">
-                <h6 className="text-warning">Pending Review</h6>
-                <h1 className="display-4 fw-bold">{stats.pending}</h1>
+                <h6 className="text-danger">Rejected Blogs</h6>
+                <h1 className="display-4 fw-bold">{stats.rejected}</h1>
               </div>
               <div className="card-footer bg-light border-0 text-end">
-                <FontAwesomeIcon icon={faClock} className="text-warning opacity-50" size="lg" />
+                <FontAwesomeIcon icon={faBan} className="text-danger opacity-50" size="lg" />
               </div>
             </div>
           </div>
@@ -218,7 +219,7 @@ export default function Dashboard() {
                                         ? 'Your blog has been approved and published! We\'ve sent you an email with the link.'
                                         : submission.status === 'pending'
                                             ? 'Your blog is currently being reviewed for word count and originality.'
-                                            : 'Your blog was rejected. Please check the details for more information.'}
+                                            : 'Your blog was rejected Because of plagiarism or other issues. Please check your email for details.'}
                                 </span>
                             </div>
                             {submission.status === 'published' && (
